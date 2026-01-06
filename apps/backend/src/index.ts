@@ -19,7 +19,7 @@ app.use(express.json());
 app.get('/health', (req, res) => {
   res.json({
     status: 'ok',
-    message: 'Coffee Tracker API is running!',
+    message: 'Sipsip API is running!',
     timestamp: new Date().toISOString(),
   });
 });
@@ -27,7 +27,7 @@ app.get('/health', (req, res) => {
 // API documentation endpoint
 app.get('/api', (req, res) => {
   res.json({
-    message: 'Welcome to Coffee Tracker API',
+    message: 'Welcome to Sipsip API',
     version: '1.0.0',
     endpoints: {
       health: '/health',

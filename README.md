@@ -1,4 +1,4 @@
-# Coffee Intake Tracker
+# Sipsip ☕
 
 A web application for tracking your daily coffee consumption with beautiful visualizations including a GitHub-style contribution grid.
 
