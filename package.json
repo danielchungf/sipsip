@@ -1,0 +1,26 @@
+{
+  "name": "coffee",
+  "version": "1.0.0",
+  "description": "Coffee intake tracking web application",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"pnpm --filter backend dev\" \"pnpm --filter frontend dev\"",
+    "build": "pnpm -r build",
+    "db:push": "pnpm --filter backend db:push",
+    "db:migrate": "pnpm --filter backend db:migrate",
+    "db:seed": "pnpm --filter backend db:seed",
+    "db:studio": "pnpm --filter backend db:studio"
+  },
+  "keywords": [
+    "coffee",
+    "tracker",
+    "health",
+    "web-app"
+  ],
+  "author": "Danny",
+  "license": "MIT",
+  "packageManager": "pnpm@10.27.0",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

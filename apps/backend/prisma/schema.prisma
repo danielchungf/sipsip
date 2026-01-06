@@ -1,0 +1,64 @@
+// This is your Prisma schema file
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  username  String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  coffeeEntries CoffeeEntry[]
+
+  @@map("users")
+}
+
+model CoffeeEntry {
+  id         String     @id @default(uuid())
+  userId     String
+  type       CoffeeType
+  size       CoffeeSize
+  caffeine   Int        @default(0)
+  notes      String?    @db.Text
+  consumedAt DateTime   @default(now())
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, consumedAt])
+  @@index([userId])
+  @@map("coffee_entries")
+}
+
+enum CoffeeType {
+  ESPRESSO
+  AMERICANO
+  LATTE
+  CAPPUCCINO
+  FLAT_WHITE
+  MACCHIATO
+  MOCHA
+  COLD_BREW
+  ICED_COFFEE
+  DRIP_COFFEE
+  POUR_OVER
+  FRENCH_PRESS
+  OTHER
+}
+
+enum CoffeeSize {
+  SMALL
+  MEDIUM
+  LARGE
+  EXTRA_LARGE
+}

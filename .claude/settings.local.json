@@ -1,0 +1,40 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm --version:*)",
+      "Bash(npm install:*)",
+      "Bash(pnpm init)",
+      "Bash(pnpm create:*)",
+      "Bash(pnpm add:*)",
+      "Bash(pnpm tailwindcss:*)",
+      "Bash(npx tailwindcss:*)",
+      "Bash(pnpm install:*)",
+      "Bash(npx prisma init)",
+      "Bash(docker-compose up:*)",
+      "Bash(docker compose:*)",
+      "Bash(pnpm prisma generate:*)",
+      "Bash(npx:*)",
+      "Bash(pnpm remove:*)",
+      "Bash(pnpm --filter backend tsc:*)",
+      "Bash(pnpm --filter frontend tsc:*)",
+      "Bash(pnpm --filter shared tsc:*)",
+      "Bash(tree:*)",
+      "Bash(find:*)",
+      "Bash(docker:*)",
+      "Bash(pnpm db:migrate:*)",
+      "Bash(pnpm --filter backend dev:*)",
+      "Bash(curl:*)",
+      "Bash(jq:*)",
+      "Bash(cat:*)",
+      "Bash(TOKEN=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIwNmIyOWU1MC05NWNlLTQ0ZjEtODNlZC0xZGVmYjZhYWU0ZjQiLCJlbWFpbCI6ImRhbm55QHRlc3QuY29tIiwiaWF0IjoxNzY3NjUwOTg0LCJleHAiOjE3NjgyNTU3ODR9.yWW56ds3Heczp5Uly6U15xnkggi7PmDoXPIhexvhyb0\":*)",
+      "Bash(pnpm db:seed:*)",
+      "Bash(pnpm:*)",
+      "Bash(TOKEN=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI0ZDkxYzY0OS01MzY4LTQ4M2QtOWVmZS05MTZjZWJhN2Y1YmIiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJpYXQiOjE3Njc2NTIwODQsImV4cCI6MTc2ODI1Njg4NH0.L1Hqz5iJc2GGMWn0Ux2ooMkY2KLcWEnOZk3s3R5Ht3M\")",
+      "Bash(tsx src/index.ts:*)",
+      "Bash(pkill:*)",
+      "Bash(ls:*)",
+      "Bash(git init:*)",
+      "Bash(git add:*)"
+    ]
+  }
+}
