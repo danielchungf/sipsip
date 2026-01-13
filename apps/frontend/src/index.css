@@ -1,5 +1,19 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "Young Serif";
+  src: url("/fonts/YoungSerif-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Young Serif";
+  src: url("/fonts/YoungSerif-Medium.otf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+}
+
 @theme {
   --color-coffee-50: #f9f7f4;
   --color-coffee-100: #f0ebe3;
@@ -11,4 +25,6 @@
   --color-coffee-700: #6f5640;
   --color-coffee-800: #584536;
   --color-coffee-900: #47382d;
+
+  --font-family-young-serif: "Young Serif", serif;
 }

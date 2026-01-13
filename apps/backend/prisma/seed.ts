@@ -15,7 +15,7 @@ async function main() {
     user = await prisma.user.create({
       data: {
         email: 'danny@test.com',
-        username: 'danny',
+        username: 'Danny',
         password: await hashPassword('testpass123'),
       },
     });
@@ -30,69 +30,72 @@ async function main() {
   });
   console.log(`🗑️  Deleted ${deleted.count} existing entries`);
 
-  // Create coffee entries for the last 30 days
-  const coffeeTypes = ['LATTE', 'ESPRESSO', 'AMERICANO', 'COLD_BREW', 'CAPPUCCINO', 'DRIP_COFFEE'] as const;
-  const sizes = ['SMALL', 'MEDIUM', 'LARGE'] as const;
-  const caffeineLookup: Record<string, Record<string, number>> = {
-    LATTE: { SMALL: 75, MEDIUM: 150, LARGE: 225 },
-    ESPRESSO: { SMALL: 64, MEDIUM: 128, LARGE: 192 },
-    AMERICANO: { SMALL: 77, MEDIUM: 154, LARGE: 231 },
-    COLD_BREW: { SMALL: 150, MEDIUM: 200, LARGE: 300 },
-    CAPPUCCINO: { SMALL: 75, MEDIUM: 150, LARGE: 225 },
-    DRIP_COFFEE: { SMALL: 95, MEDIUM: 140, LARGE: 210 },
-  };
+  // Create specific coffee entries matching the screenshot
+  const entries = [
+    // 01/01: 1 entry
+    { day: 1, type: 'LATTE', size: 'MEDIUM', caffeine: 150 },
 
-  const entries = [];
+    // 01/02: 1 entry
+    { day: 2, type: 'LATTE', size: 'MEDIUM', caffeine: 150 },
+
+    // 01/04: 1 entry
+    { day: 4, type: 'LATTE', size: 'MEDIUM', caffeine: 150 },
+
+    // 01/05: 2 entries (Carmen)
+    { day: 5, type: 'LATTE', size: 'MEDIUM', caffeine: 150, notes: 'de Carmen' },
+    { day: 5, type: 'LATTE', size: 'MEDIUM', caffeine: 150 },
+
+    // 01/06: 1 entry
+    { day: 6, type: 'LATTE', size: 'MEDIUM', caffeine: 150 },
+
+    // 01/06: 1 entry (second one)
+    { day: 6, type: 'LATTE', size: 'MEDIUM', caffeine: 150 },
+
+    // 01/07: 1 entry
+    { day: 7, type: 'LATTE', size: 'MEDIUM', caffeine: 150 },
+
+    // 01/07: 1 entry (second one)
+    { day: 7, type: 'LATTE', size: 'MEDIUM', caffeine: 150 },
+
+    // 01/08: 1 entry
+    { day: 8, type: 'LATTE', size: 'MEDIUM', caffeine: 150 },
+
+    // 01/08: 1 entry (second one)
+    { day: 8, type: 'LATTE', size: 'MEDIUM', caffeine: 150 },
+  ];
+
   const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth(); // 0-indexed
 
-  // Create varying amounts of coffee per day
-  for (let daysAgo = 0; daysAgo < 30; daysAgo++) {
-    const date = new Date(now);
-    date.setDate(now.getDate() - daysAgo);
+  const entryData = entries.map((entry, index) => {
+    const consumedAt = new Date(currentYear, currentMonth, entry.day, 10 + index, 0, 0);
 
-    // Random number of coffees per day (0-4)
-    const coffeesPerDay = Math.floor(Math.random() * 5);
-
-    for (let i = 0; i < coffeesPerDay; i++) {
-      const type = coffeeTypes[Math.floor(Math.random() * coffeeTypes.length)];
-      const size = sizes[Math.floor(Math.random() * sizes.length)];
-      const caffeine = caffeineLookup[type][size];
-
-      // Random time during the day
-      const hour = 6 + Math.floor(Math.random() * 16); // Between 6 AM and 10 PM
-      const minute = Math.floor(Math.random() * 60);
-
-      const consumedAt = new Date(date);
-      consumedAt.setHours(hour, minute, 0, 0);
-
-      entries.push({
-        userId: user.id,
-        type,
-        size,
-        caffeine,
-        consumedAt,
-        notes: i === 0 ? 'Morning coffee' : i === coffeesPerDay - 1 ? 'Evening coffee' : undefined,
-      });
-    }
-  }
+    return {
+      userId: user.id,
+      type: entry.type as 'LATTE',
+      size: entry.size as 'MEDIUM',
+      caffeine: entry.caffeine,
+      consumedAt,
+      notes: entry.notes,
+    };
+  });
 
   // Create entries
   await prisma.coffeeEntry.createMany({
-    data: entries,
+    data: entryData,
   });
 
-  console.log(`✅ Created ${entries.length} coffee entries over the last 30 days`);
+  console.log(`✅ Created ${entryData.length} coffee entries for January`);
 
   // Calculate stats
-  const totalCaffeine = entries.reduce((sum, e) => sum + e.caffeine, 0);
-  const avgPerDay = (entries.length / 30).toFixed(1);
-  const avgCaffeinePerDay = (totalCaffeine / 30).toFixed(0);
+  const totalCaffeine = entryData.reduce((sum, e) => sum + e.caffeine, 0);
+  const uniqueDays = new Set(entryData.map(e => e.consumedAt.getDate())).size;
 
   console.log('\n📊 Summary:');
-  console.log(`   Total entries: ${entries.length}`);
-  console.log(`   Average per day: ${avgPerDay}`);
+  console.log(`   Total entries: ${entryData.length}`);
+  console.log(`   Days with coffee: ${uniqueDays}`);
   console.log(`   Total caffeine: ${totalCaffeine}mg`);
-  console.log(`   Average caffeine/day: ${avgCaffeinePerDay}mg`);
   console.log('\n🎉 Seed complete!');
 }
 
