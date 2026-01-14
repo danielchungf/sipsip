@@ -5,7 +5,7 @@ import type { CoffeeEntry } from '@coffee/shared';
 import AddEntryModal from '../components/AddEntryModal';
 
 export default function Progress() {
-  const { user } = useAuth();
+  const { user: _user } = useAuth();
   const [entries, setEntries] = useState<CoffeeEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);

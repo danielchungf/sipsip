@@ -3,7 +3,6 @@ import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import Entries from './pages/Entries';
 import Home from './pages/Home';
 import Progress from './pages/Progress';
 
