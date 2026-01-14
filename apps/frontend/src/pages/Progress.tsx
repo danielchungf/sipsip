@@ -71,6 +71,28 @@ export default function Progress() {
     }
   });
 
+  // For month view, calculate the starting day of week and create a calendar grid
+  const calendarGrid = viewMode === 'month' ? (() => {
+    const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
+    let startingDayOfWeek = firstDayOfMonth.getDay(); // 0 = Sunday, 1 = Monday, etc.
+
+    // Convert to Monday-first week (Monday = 0, Sunday = 6)
+    startingDayOfWeek = startingDayOfWeek === 0 ? 6 : startingDayOfWeek - 1;
+
+    // Create array with empty slots for days before the month starts
+    const grid = [];
+
+    // Add empty slots for days before the 1st
+    for (let i = 0; i < startingDayOfWeek; i++) {
+      grid.push({ day: null, hasEntry: false });
+    }
+
+    // Add all days of the month
+    grid.push(...daysGrid);
+
+    return grid;
+  })() : daysGrid;
+
   const handleEntrySuccess = () => {
     fetchEntries();
     setIsModalOpen(false);
@@ -87,13 +109,13 @@ export default function Progress() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-[#FEFAF4] px-6 py-12">
       {/* Count Display */}
-      <h1 className="text-[60px] font-bold text-neutral-800 mb-2" style={{ fontFamily: '"Young Serif", serif' }}>
+      <h1 className="text-[60px] font-medium text-neutral-800 mb-2" style={{ fontFamily: 'Rubik, sans-serif' }}>
         {filteredEntries.length}
       </h1>
 
       {/* Subtitle */}
-      <p className="text-[24px] text-neutral-800 mb-10" style={{ fontFamily: '"Young Serif", serif', fontWeight: 400 }}>
-        cups of coffee this{' '}
+      <p className="text-[24px] text-neutral-800 mb-10" style={{ fontFamily: '"Young Serif", serif', fontWeight: 'normal' }}>
+        {filteredEntries.length === 1 ? 'cup' : 'cups'} of coffee this{' '}
         <button
           onClick={() => setViewMode(viewMode === 'month' ? 'year' : 'month')}
           className="underline hover:text-neutral-600 transition-colors"
@@ -103,30 +125,56 @@ export default function Progress() {
       </p>
 
       {/* Coffee Beans Grid */}
-      <div className="mb-10 flex flex-wrap justify-start w-[320px]">
-        {daysGrid.map(({ day, hasEntry }) => (
-          <img
-            key={day}
-            src="/bean.png"
-            alt={`Day ${day}`}
-            className="w-5 h-5"
-            style={{ opacity: hasEntry ? 1 : 0.1 }}
-          />
-        ))}
-      </div>
+      {viewMode === 'month' ? (
+        <div className="mb-10 flex flex-wrap justify-start gap-[2px] w-[152px]">
+          {calendarGrid.map((item, idx) => (
+            item.day !== null ? (
+              <img
+                key={idx}
+                src="/bean.png"
+                alt={`Day ${item.day}`}
+                className="w-5 h-5"
+                style={{ opacity: item.hasEntry ? 1 : 0.1 }}
+              />
+            ) : (
+              <div key={idx} className="w-5 h-5" />
+            )
+          ))}
+        </div>
+      ) : (
+        <div className="mb-10 flex flex-wrap justify-start gap-[2px] w-[350px]">
+          {daysGrid.map(({ day, hasEntry }) => (
+            <img
+              key={day}
+              src="/bean.png"
+              alt={`Day ${day}`}
+              className="w-5 h-5"
+              style={{ opacity: hasEntry ? 1 : 0.1 }}
+            />
+          ))}
+        </div>
+      )}
 
-      {/* Add Entry Button */}
+      {/* Log Another Sip Button */}
       <button
         onClick={() => setIsModalOpen(true)}
-        className="flex items-center gap-2 text-[20px] text-neutral-800 underline hover:text-neutral-600 transition-colors"
-        style={{ fontFamily: '"Young Serif", serif', fontWeight: 400 }}
+        className="flex items-center gap-1 text-neutral-800 hover:text-neutral-600 transition-colors group"
       >
-        <img
-          src="/cup-filled.png"
-          alt="Add entry"
-          className="w-11 h-11"
-        />
-        Add entry
+        <div className="relative w-11 h-11">
+          <img
+            src="/cup-empty.png"
+            alt="Empty cup"
+            className="w-11 h-11 absolute inset-0 transition-opacity duration-300 group-hover:opacity-0"
+          />
+          <img
+            src="/cup-filled.png"
+            alt="Filled cup"
+            className="w-11 h-11 absolute inset-0 transition-opacity duration-300 opacity-0 group-hover:opacity-100"
+          />
+        </div>
+        <span className="text-[20px] px-1" style={{ fontFamily: '"Young Serif", serif', fontWeight: 'normal' }}>
+          Log another sip
+        </span>
       </button>
 
       {/* Error Message */}
@@ -136,7 +184,7 @@ export default function Progress() {
         </div>
       )}
 
-      {/* Add Entry Modal */}
+      {/* Log Another Sip Modal */}
       <AddEntryModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

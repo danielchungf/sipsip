@@ -1,8 +1,8 @@
-import { Router } from 'express';
+import { Router, type Router as RouterType } from 'express';
 import { entriesController } from '../controllers/entries.controller.js';
 import { authenticate } from '../middleware/auth.middleware.js';
 
-const router = Router();
+const router: RouterType = Router();
 
 // All routes are protected
 router.use(authenticate);

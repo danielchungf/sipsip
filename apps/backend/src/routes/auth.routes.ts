@@ -1,8 +1,8 @@
-import { Router } from 'express';
+import { Router, type Router as RouterType } from 'express';
 import { authController } from '../controllers/auth.controller.js';
 import { authenticate } from '../middleware/auth.middleware.js';
 
-const router = Router();
+const router: RouterType = Router();
 
 // Public routes
 router.post('/register', (req, res) => authController.register(req, res));

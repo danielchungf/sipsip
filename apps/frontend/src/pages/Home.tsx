@@ -31,7 +31,7 @@ export default function Home() {
       </button>
 
       {/* CTA Text */}
-      <p className="text-[24px] text-neutral-800 text-center mb-8 transition-all duration-700 ease-in-out" style={{ fontFamily: '"Young Serif", serif', fontWeight: 400 }}>
+      <p className="text-[24px] text-neutral-800 text-center mb-8 transition-all duration-700 ease-in-out" style={{ fontFamily: '"Young Serif", serif', fontWeight: 'normal' }}>
         {cupState === 'logging'
           ? 'Filling your cup...'
           : cupState === 'filled'
