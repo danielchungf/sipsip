@@ -19,7 +19,13 @@ export default function Login() {
       await login({ email, password });
       navigate('/');
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to login');
+      const errorMessage = err.response?.data?.error || 'Failed to login';
+      // Make error messages more user-friendly
+      if (errorMessage === 'Invalid credentials') {
+        setError('Incorrect email or password. Please try again.');
+      } else {
+        setError(errorMessage);
+      }
     } finally {
       setLoading(false);
     }

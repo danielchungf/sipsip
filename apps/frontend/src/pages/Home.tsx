@@ -10,7 +10,7 @@ export default function Home() {
   const isInteractive = cupState !== 'logging';
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-[#FEFAF4] px-6">
+    <div className="h-screen flex flex-col items-center justify-center bg-[#FEFAF4] px-6 overflow-hidden">
       {/* Greeting */}
       <h1 className="text-[36px] text-neutral-800 mb-5 text-center" style={{ fontFamily: '"Young Serif", serif', fontWeight: 500 }}>
         {getGreetingText(user?.username || 'Friend')}

@@ -20,7 +20,17 @@ export default function Register() {
       await register({ email, username, password });
       navigate('/');
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to register');
+      const errorMessage = err.response?.data?.error || 'Failed to register';
+      // Make error messages more user-friendly
+      if (errorMessage.includes('Email already exists')) {
+        setError('This email is already registered. Please use a different email or try logging in.');
+      } else if (errorMessage.includes('Username already exists')) {
+        setError('This username is already taken. Please choose a different one.');
+      } else if (errorMessage.includes('already')) {
+        setError('An account with these details already exists. Please try logging in.');
+      } else {
+        setError(errorMessage);
+      }
     } finally {
       setLoading(false);
     }
@@ -65,7 +75,7 @@ export default function Register() {
             </div>
             <div>
               <label htmlFor="username" className="sr-only">
-                Username
+                Name or nickname
               </label>
               <input
                 id="username"
@@ -76,7 +86,7 @@ export default function Register() {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-coffee-500 focus:border-coffee-500 focus:z-10 sm:text-sm"
-                placeholder="Username"
+                placeholder="Name or nickname"
               />
             </div>
             <div>
