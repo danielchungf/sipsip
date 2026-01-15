@@ -107,7 +107,7 @@ export default function Progress() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-[#FEFAF4] px-6 py-12">
+    <div className="h-screen flex flex-col items-center justify-center bg-[#FEFAF4] px-6 overflow-hidden">
       {/* Count Display */}
       <h1 className="text-[60px] font-medium text-neutral-800 mb-2" style={{ fontFamily: 'Rubik, sans-serif' }}>
         {filteredEntries.length}
