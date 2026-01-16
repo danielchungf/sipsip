@@ -96,10 +96,12 @@ export class StatsService {
     // Calculate total caffeine
     const totalCaffeine = allEntries.reduce((sum, entry) => sum + entry.caffeine, 0);
 
-    // Find most common coffee type
+    // Find most common coffee type (only count default types, not custom)
     const typeCounts = new Map<CoffeeType, number>();
     for (const entry of allEntries) {
-      typeCounts.set(entry.type, (typeCounts.get(entry.type) || 0) + 1);
+      if (entry.type) {
+        typeCounts.set(entry.type, (typeCounts.get(entry.type) || 0) + 1);
+      }
     }
 
     let mostCommonType: CoffeeType | undefined;

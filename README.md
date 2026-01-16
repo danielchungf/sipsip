@@ -6,6 +6,8 @@ A web application for tracking your daily coffee consumption with beautiful visu
 
 - **Frontend:** React 19, Vite, TypeScript, Tailwind CSS, React Query
 - **Backend:** Express, TypeScript, Prisma ORM, PostgreSQL
+- **Database:** Supabase (PostgreSQL)
+- **Hosting:** Render (frontend & backend)
 - **Monorepo:** pnpm workspaces
 
 ## Features
@@ -24,47 +26,50 @@ coffee/
 ├── apps/
 │   ├── frontend/          # React application
 │   └── backend/           # Express API
-├── packages/
-│   └── shared/            # Shared types, validators, constants
-└── docker-compose.yml     # PostgreSQL database
+└── packages/
+    └── shared/            # Shared types, validators, constants
 ```
 
 ## Prerequisites
 
-- **Node.js** 20+ (you have v20.18.3 ✓)
-- **pnpm** (installed ✓)
-- **Docker** (required for PostgreSQL database - NOT YET INSTALLED)
+- **Node.js** 20+
+- **pnpm**
+- **Supabase account** (for PostgreSQL database)
 
 ## Installation
 
-### 1. Install Docker Desktop
-
-Since Docker is not installed on your system, you'll need to install it to run PostgreSQL:
-
-**macOS:**
-- Download Docker Desktop from: https://www.docker.com/products/docker-desktop
-- Install and start Docker Desktop
-- Verify installation: `docker --version`
-
-### 2. Install Dependencies
-
-Dependencies are already installed! If you need to reinstall:
+### 1. Install Dependencies
 
 \`\`\`bash
 pnpm install
 \`\`\`
 
-### 3. Start the Database
+### 2. Configure Environment Variables
+
+Create environment files from the examples:
 
 \`\`\`bash
-# Start PostgreSQL container
-docker compose up -d
+# Backend environment
+cp apps/backend/.env.example apps/backend/.env
 
-# Check if database is running
-docker ps
+# Frontend environment
+cp apps/frontend/.env.example apps/frontend/.env
 \`\`\`
 
-### 4. Setup the Database
+Update `apps/backend/.env` with your Supabase connection string:
+
+\`\`\`env
+DATABASE_URL="postgresql://postgres:[PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres"
+JWT_SECRET="your-secret-key"
+\`\`\`
+
+Update `apps/frontend/.env`:
+
+\`\`\`env
+VITE_API_URL=http://localhost:3000/api
+\`\`\`
+
+### 3. Setup the Database
 
 \`\`\`bash
 # Run database migrations
@@ -74,21 +79,7 @@ pnpm db:migrate
 pnpm db:seed
 \`\`\`
 
-### 5. Configure Environment Variables
-
-Frontend and backend .env.example files are already created. Copy them:
-
-\`\`\`bash
-# Backend environment
-cp apps/backend/.env.example apps/backend/.env
-# (Already created with default values)
-
-# Frontend environment
-cp apps/frontend/.env.example apps/frontend/.env
-# Add: VITE_API_URL=http://localhost:3000/api
-\`\`\`
-
-### 6. Start Development Servers
+### 4. Start Development Servers
 
 \`\`\`bash
 # Start both frontend and backend
@@ -176,22 +167,47 @@ Now that the project structure is set up, here's what comes next:
 - [ ] Error handling and loading states
 - [ ] Responsive design
 - [ ] Testing
-- [ ] Deployment
+- [x] Deployment (Render + Supabase)
+
+## Deployment
+
+### Supabase (Database)
+
+1. Create a new project at [supabase.com](https://supabase.com)
+2. Copy the connection string from Settings > Database
+3. Add it as `DATABASE_URL` in your environment variables
+
+### Render (Backend)
+
+1. Create a new **Web Service** on [render.com](https://render.com)
+2. Connect your repository
+3. Configure:
+   - **Root Directory:** `apps/backend`
+   - **Build Command:** `pnpm install && pnpm db:generate && pnpm build`
+   - **Start Command:** `pnpm start`
+4. Add environment variables:
+   - `DATABASE_URL` - Supabase connection string
+   - `JWT_SECRET` - Your secret key
+
+### Render (Frontend)
+
+1. Create a new **Static Site** on Render
+2. Connect your repository
+3. Configure:
+   - **Root Directory:** `apps/frontend`
+   - **Build Command:** `pnpm install && pnpm build`
+   - **Publish Directory:** `dist`
+4. Add environment variables:
+   - `VITE_API_URL` - Your backend URL (e.g., `https://your-backend.onrender.com/api`)
 
 ## Troubleshooting
 
-### Docker Not Running
-If you see "command not found: docker":
-1. Install Docker Desktop (see Prerequisites)
-2. Make sure Docker Desktop is running
-3. Restart your terminal
-
 ### Port Already in Use
-If port 5432 (Postgres) or 3000 (Backend) is in use:
+If port 3000 (Backend) or 5173 (Frontend) is in use:
 \`\`\`bash
 # Find and kill process on port
-lsof -ti:5432 | xargs kill -9
 lsof -ti:3000 | xargs kill -9
+lsof -ti:5173 | xargs kill -9
 \`\`\`
 
 ### Prisma Issues
@@ -200,6 +216,11 @@ If Prisma commands fail:
 # Regenerate Prisma Client
 pnpm --filter backend db:generate
 \`\`\`
+
+### Supabase Connection Issues
+- Ensure your IP is allowed in Supabase Dashboard > Settings > Database > Connection Pooling
+- Check that the connection string uses the correct password
+- For serverless/Render, use the **pooled connection string** (port 6543)
 
 ## Contributing
 

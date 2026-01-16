@@ -1,7 +1,11 @@
-import { useState } from 'react';
-import type { CoffeeType, CoffeeSize, CoffeeEntry } from '@coffee/shared';
+import { useState, useEffect } from 'react';
+import type { CoffeeType, CoffeeSize, CoffeeEntry, CustomCoffeeType, Companion } from '@coffee/shared';
 import { COFFEE_TYPES, COFFEE_SIZES } from '@coffee/shared';
 import { entriesService } from '../services/entries.service';
+import { customTypesService } from '../services/customTypes.service';
+import { companionsService } from '../services/companions.service';
+import SelectWithCreate from './SelectWithCreate';
+import MultiSelectWithCreate from './MultiSelectWithCreate';
 
 interface CoffeeEntryFormProps {
   onSuccess: () => void;
@@ -10,7 +14,15 @@ interface CoffeeEntryFormProps {
 }
 
 export default function CoffeeEntryForm({ onSuccess, editEntry, onCancel }: CoffeeEntryFormProps) {
-  const [type, setType] = useState<CoffeeType>(editEntry?.type || 'LATTE');
+  // Determine initial type value: custom type ID or default type
+  const getInitialTypeValue = () => {
+    if (editEntry?.customTypeId) {
+      return `custom:${editEntry.customTypeId}`;
+    }
+    return editEntry?.type || 'LATTE';
+  };
+
+  const [typeValue, setTypeValue] = useState<string>(getInitialTypeValue());
   const [size, setSize] = useState<CoffeeSize>(editEntry?.size || 'MEDIUM');
   const [notes, setNotes] = useState(editEntry?.notes || '');
   const [consumedAt, setConsumedAt] = useState(
@@ -18,8 +30,73 @@ export default function CoffeeEntryForm({ onSuccess, editEntry, onCancel }: Coff
       ? new Date(editEntry.consumedAt).toISOString().slice(0, 16)
       : new Date().toISOString().slice(0, 16)
   );
+  const [companionIds, setCompanionIds] = useState<string[]>(
+    editEntry?.companions?.map((c) => c.id) || []
+  );
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Data for dropdowns
+  const [customTypes, setCustomTypes] = useState<CustomCoffeeType[]>([]);
+  const [companions, setCompanions] = useState<Companion[]>([]);
+  const [dataLoading, setDataLoading] = useState(true);
+
+  // Helper to format enum values for display
+  const formatLabel = (value: string): string => {
+    return value
+      .split('_')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+  };
+
+  // Fetch custom types and companions on mount
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [types, comps] = await Promise.all([
+          customTypesService.getCustomTypes(),
+          companionsService.getCompanions(),
+        ]);
+        setCustomTypes(types);
+        setCompanions(comps);
+      } catch (err) {
+        console.error('Failed to fetch dropdown data:', err);
+      } finally {
+        setDataLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  // Build type options: default types + custom types
+  const typeOptions = [
+    ...COFFEE_TYPES.map((t) => ({
+      value: t,
+      label: formatLabel(t),
+    })),
+    ...customTypes.map((ct) => ({
+      value: `custom:${ct.id}`,
+      label: ct.name,
+    })),
+  ];
+
+  // Build companion options
+  const companionOptions = companions.map((c) => ({
+    value: c.id,
+    label: c.name,
+  }));
+
+  const handleCreateCustomType = async (name: string): Promise<string> => {
+    const newType = await customTypesService.createCustomType({ name });
+    setCustomTypes((prev) => [...prev, newType].sort((a, b) => a.name.localeCompare(b.name)));
+    return `custom:${newType.id}`;
+  };
+
+  const handleCreateCompanion = async (name: string): Promise<string> => {
+    const newCompanion = await companionsService.createCompanion({ name });
+    setCompanions((prev) => [...prev, newCompanion].sort((a, b) => a.name.localeCompare(b.name)));
+    return newCompanion.id;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,11 +104,15 @@ export default function CoffeeEntryForm({ onSuccess, editEntry, onCancel }: Coff
     setLoading(true);
 
     try {
+      // Parse type value to determine if it's a default type or custom type
+      const isCustomType = typeValue.startsWith('custom:');
       const data = {
-        type,
+        type: isCustomType ? undefined : (typeValue as CoffeeType),
+        customTypeId: isCustomType ? typeValue.replace('custom:', '') : undefined,
         size,
         notes: notes || undefined,
         consumedAt: new Date(consumedAt).toISOString(),
+        companionIds: companionIds.length > 0 ? companionIds : undefined,
       };
 
       if (editEntry) {
@@ -48,12 +129,6 @@ export default function CoffeeEntryForm({ onSuccess, editEntry, onCancel }: Coff
     }
   };
 
-  const formatLabel = (value: string): string => {
-    return value.split('_').map(word =>
-      word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-    ).join(' ');
-  };
-
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {error && (
@@ -62,23 +137,17 @@ export default function CoffeeEntryForm({ onSuccess, editEntry, onCancel }: Coff
         </div>
       )}
 
-      <div>
-        <label htmlFor="type" className="block text-sm font-medium text-gray-700">
-          Coffee Type
-        </label>
-        <select
-          id="type"
-          value={type}
-          onChange={(e) => setType(e.target.value as CoffeeType)}
-          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-coffee-500 focus:border-coffee-500 sm:text-sm"
-        >
-          {COFFEE_TYPES.map((coffeeType) => (
-            <option key={coffeeType} value={coffeeType}>
-              {formatLabel(coffeeType)}
-            </option>
-          ))}
-        </select>
-      </div>
+      <SelectWithCreate
+        id="type"
+        label="Coffee Type"
+        options={typeOptions}
+        value={typeValue}
+        onChange={setTypeValue}
+        onCreateNew={handleCreateCustomType}
+        placeholder="Select a coffee type..."
+        createLabel="+ Add custom type..."
+        isLoading={dataLoading}
+      />
 
       <div>
         <label htmlFor="size" className="block text-sm font-medium text-gray-700">
@@ -125,6 +194,16 @@ export default function CoffeeEntryForm({ onSuccess, editEntry, onCancel }: Coff
           placeholder="Add any notes about this coffee..."
         />
       </div>
+
+      <MultiSelectWithCreate
+        id="companions"
+        label="Shared with (optional)"
+        options={companionOptions}
+        selectedValues={companionIds}
+        onChange={setCompanionIds}
+        onCreateNew={handleCreateCompanion}
+        placeholder="Who did you share this coffee with?"
+      />
 
       <div className="flex gap-3">
         <button
