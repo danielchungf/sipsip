@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { CoffeeType, CoffeeSize, CustomCoffeeType, Companion } from '@coffee/shared';
-import { COFFEE_TYPES, COFFEE_SIZES } from '@coffee/shared';
+import { COFFEE_TYPES } from '@coffee/shared';
 import { entriesService } from '../services/entries.service';
 import { customTypesService } from '../services/customTypes.service';
 import { companionsService } from '../services/companions.service';
