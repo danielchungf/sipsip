@@ -99,6 +99,9 @@ export default function Home() {
         onClose={handleModalClose}
         onSuccess={handleModalSuccess}
         hideDate
+        title="Complete coffee details"
+        submitLabel="Complete entry"
+        showCancel={false}
       />
     </div>
   );

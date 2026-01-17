@@ -12,9 +12,20 @@ interface AddEntryModalProps {
   onClose: () => void;
   onSuccess: () => void;
   hideDate?: boolean;
+  title?: string;
+  submitLabel?: string;
+  showCancel?: boolean;
 }
 
-export default function AddEntryModal({ isOpen, onClose, onSuccess, hideDate = false }: AddEntryModalProps) {
+export default function AddEntryModal({
+  isOpen,
+  onClose,
+  onSuccess,
+  hideDate = false,
+  title = 'Log another cup of coffee',
+  submitLabel = 'Add entry',
+  showCancel = true,
+}: AddEntryModalProps) {
   const [typeValue, setTypeValue] = useState<string>('LATTE');
   const [size, setSize] = useState<CoffeeSize>('MEDIUM');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
@@ -138,7 +149,7 @@ export default function AddEntryModal({ isOpen, onClose, onSuccess, hideDate = f
     <div className="fixed inset-0 flex items-center justify-center p-4 z-50 bg-[#FEFAF4]">
       <div className="bg-white rounded-lg shadow-2xl p-8 max-w-md w-full max-h-[90vh] overflow-y-auto">
         <h2 className="text-2xl font-medium mb-6 text-neutral-800" style={{ fontFamily: '"Young Serif", serif' }}>
-          Log another cup of coffee
+          {title}
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -225,19 +236,21 @@ export default function AddEntryModal({ isOpen, onClose, onSuccess, hideDate = f
           />
 
           <div className="flex gap-3 pt-2">
-            <button
-              type="button"
-              onClick={handleClose}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-neutral-700 hover:bg-gray-50 transition-colors"
-            >
-              Cancel
-            </button>
+            {showCancel && (
+              <button
+                type="button"
+                onClick={handleClose}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-neutral-700 hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+            )}
             <button
               type="submit"
               disabled={loading}
               className="flex-1 px-4 py-2 bg-neutral-800 text-white rounded-md hover:bg-neutral-700 disabled:opacity-50 transition-colors"
             >
-              {loading ? 'Adding...' : 'Add entry'}
+              {loading ? 'Adding...' : submitLabel}
             </button>
           </div>
         </form>
