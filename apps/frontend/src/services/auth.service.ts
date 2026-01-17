@@ -41,6 +41,17 @@ export const authService = {
     return userStr ? JSON.parse(userStr) : null;
   },
 
+  async fetchCurrentUser(): Promise<User | null> {
+    try {
+      const response = await api.get<User>('/auth/me');
+      // Update localStorage with fresh data
+      localStorage.setItem('user', JSON.stringify(response.data));
+      return response.data;
+    } catch {
+      return null;
+    }
+  },
+
   getToken(): string | null {
     return localStorage.getItem('token');
   },

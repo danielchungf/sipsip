@@ -18,10 +18,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is logged in on mount
-    const currentUser = authService.getCurrentUser();
-    setUser(currentUser);
-    setLoading(false);
+    // Fetch fresh user data on mount
+    const initAuth = async () => {
+      const token = authService.getToken();
+      if (token) {
+        // Fetch fresh user data from API
+        const freshUser = await authService.fetchCurrentUser();
+        setUser(freshUser);
+      }
+      setLoading(false);
+    };
+    initAuth();
   }, []);
 
   const login = async (data: LoginData) => {
