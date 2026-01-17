@@ -11,9 +11,10 @@ interface AddEntryModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
+  hideDate?: boolean;
 }
 
-export default function AddEntryModal({ isOpen, onClose, onSuccess }: AddEntryModalProps) {
+export default function AddEntryModal({ isOpen, onClose, onSuccess, hideDate = false }: AddEntryModalProps) {
   const [typeValue, setTypeValue] = useState<string>('LATTE');
   const [size, setSize] = useState<CoffeeSize>('MEDIUM');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
@@ -179,20 +180,22 @@ export default function AddEntryModal({ isOpen, onClose, onSuccess }: AddEntryMo
           </div>
           */}
 
-          <div>
-            <label htmlFor="date" className="block text-sm font-medium text-gray-700">
-              Date
-            </label>
-            <input
-              type="date"
-              id="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              max={new Date().toISOString().split('T')[0]}
-              required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-coffee-500 focus:border-coffee-500 sm:text-sm"
-            />
-          </div>
+          {!hideDate && (
+            <div>
+              <label htmlFor="date" className="block text-sm font-medium text-gray-700">
+                Date
+              </label>
+              <input
+                type="date"
+                id="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                max={new Date().toISOString().split('T')[0]}
+                required
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-coffee-500 focus:border-coffee-500 sm:text-sm"
+              />
+            </div>
+          )}
 
           {/* Notes field - commented out for now
           <div>

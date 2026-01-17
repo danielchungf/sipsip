@@ -1,14 +1,16 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getGreetingText } from '../utils/greetings';
 import { useCoffeeLog } from '../hooks/useCoffeeLog';
 import { entriesService } from '../services/entries.service';
+import AddEntryModal from '../components/AddEntryModal';
 
 export default function Home() {
   const { user } = useAuth();
-  const { cupState, error, logCoffee } = useCoffeeLog();
+  const { cupState, fillCup } = useCoffeeLog();
   const navigate = useNavigate();
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const checkTodaysCoffee = async () => {
@@ -38,6 +40,26 @@ export default function Home() {
     checkTodaysCoffee();
   }, [navigate]);
 
+  // Show modal after cup fills
+  useEffect(() => {
+    if (cupState === 'filled') {
+      const timer = setTimeout(() => {
+        setShowModal(true);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [cupState]);
+
+  const handleModalSuccess = () => {
+    setShowModal(false);
+    navigate('/progress');
+  };
+
+  const handleModalClose = () => {
+    setShowModal(false);
+    navigate('/progress');
+  };
+
   const cupImage = cupState === 'filled' ? '/cup-filled.png' : '/cup-empty.png';
   const isInteractive = cupState !== 'logging';
 
@@ -50,7 +72,7 @@ export default function Home() {
 
       {/* Cup Image */}
       <button
-        onClick={logCoffee}
+        onClick={fillCup}
         disabled={!isInteractive}
         className="mb-5 transition-all duration-500 ease-in-out hover:scale-105 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed focus:outline-none"
         aria-label="Log coffee"
@@ -71,12 +93,13 @@ export default function Home() {
           : 'Tap to fill today\'s cup of coffee'}
       </p>
 
-      {/* Error Message */}
-      {error && (
-        <div className="max-w-md w-full rounded-lg bg-red-50 p-4 text-center">
-          <p className="text-sm text-red-800">{error}</p>
-        </div>
-      )}
+      {/* Modal for collecting coffee details */}
+      <AddEntryModal
+        isOpen={showModal}
+        onClose={handleModalClose}
+        onSuccess={handleModalSuccess}
+        hideDate
+      />
     </div>
   );
 }
